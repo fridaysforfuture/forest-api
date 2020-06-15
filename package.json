@@ -1,0 +1,14 @@
+{
+  "name": "forest-api",
+  "version": "1.0.0",
+  "description": "The Forest API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Karl Felix Beecken, Vincent Woltmann",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
+}
