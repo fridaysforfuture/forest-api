@@ -1,4 +1,5 @@
 import express from 'express';
+import BodyParser from 'body-parser';
 import { entries } from '../dbHandler';
 const router = express.Router();
 
@@ -6,7 +7,7 @@ router.put('/:name', (request, response) => {
   console.log("New entry: %s", request.params.name);
   entries.updateOne(
     {
-      name: request.params.name,
+      name: request.params.name.toLowerCase(),
     },
     {
       $setOnInsert: { links: [] },
