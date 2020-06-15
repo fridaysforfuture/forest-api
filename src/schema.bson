@@ -1,0 +1,29 @@
+{
+  bsonType: "object",
+  required: ["_id", "links"],
+  "properties": {
+    "_id": { "bsonType": "objectId" },
+    "name": {
+      "bsonType": "string",
+    },
+    "links": {
+      "bsonType": "array",
+      "uniqueItems": "true",
+      "items": {
+        "bsonType": "object",
+        "required": [
+          "url",
+          "text"
+        ],
+        "properties": {
+          "url": {
+            "bsonType": "string"
+          },
+          "text": {
+            "bsonType": "string"
+          }
+        }
+      }
+    }
+  }
+}
