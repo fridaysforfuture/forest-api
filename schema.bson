@@ -1,14 +1,17 @@
 {
   bsonType: "object",
-  required: ["_id", "links"],
+  required: ["_id", "links", "friendlyName"],
   "properties": {
     "_id": { "bsonType": "objectId" },
     "name": {
       "bsonType": "string",
     },
+    "friendlyName": {
+      "bsonType": "string",
+    },
     "links": {
       "bsonType": "array",
-      "uniqueItems": "true",
+      "uniqueItems": true,
       "items": {
         "bsonType": "object",
         "required": [
