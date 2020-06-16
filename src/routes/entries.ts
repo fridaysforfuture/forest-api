@@ -1,21 +1,115 @@
 import express from 'express';
 import BodyParser from 'body-parser';
 import { entries } from '../dbHandler';
+import cors from 'cors';
+
 const router = express.Router();
 
+router.use(cors());
+function testParams(body: any) {
+   if(body.links !== undefined && !Array.isArray(body.links)) {
+    throw 'links is not an array';
+  }
+  if(body.socialLinks !== undefined && typeof(body.socialLinks) !== 'object') {
+    throw 'socialLinks is not an object';
+  }
+  if(body.friendlyName !== undefined && typeof(body.friendlyName) !== 'string') {
+    throw 'friendlyName is not a string';
+  }
+}
+
+router.use(BodyParser.json());
 router.put('/:name', (request, response) => {
   console.log("New entry: %s", request.params.name);
+
+  if(request.body.links == undefined) {
+    request.body.links = [];
+  }
+  if(request.body.socialLinks == undefined) {
+    request.body.socialLinks = {};
+  }
+  if(request.body.friendlyName == undefined) {
+    request.body.friendlyName = request.params.name
+  }
+  try
+  {
+    testParams(request.body);
+  }
+  catch (error)
+  {
+    response.status(400);
+    response.send({ error });
+    return;
+  }
+
   entries.updateOne(
     {
       name: request.params.name.toLowerCase(),
     },
     {
-      $setOnInsert: { links: [] },
+      $set: {
+        links: request.body.links,
+        socialLinks: request.body.socialLinks,
+        friendlyName: request.body.friendlyName,
+      },
     },
     { upsert: true });
 
   // Always send valid JSON!
   response.send({});
+});
+
+router.patch('/:name', (request, response) => {
+  try
+  {
+    testParams(request.body);
+  }
+  catch (error)
+  {
+    response.status(400);
+    response.send({ error });
+    return;
+  }
+  let changeSet : any = {};
+  if(request.body.links !== undefined) {
+    changeSet.links = request.body.links;
+  }
+  if(request.body.socialLinks !== undefined) {
+    changeSet.socialLink = request.body.socialLinks;
+  }
+  if(request.body.friendlyName !== undefined) {
+    changeSet.friendlyName = request.body.friendlyName;
+  }
+  if(Object.keys(changeSet).length === 0) {
+    response.status(400);
+    response.send({
+      error: "PATCH needs a parameter",
+    });
+    return;
+  };
+  entries.updateOne(
+    {
+      name: request.params.name.toLowerCase()
+    },
+    {
+      $set: changeSet,
+    }
+  ).then((result) => {
+    if(result.modifiedCount === 0)
+    {
+      // Nothing was found
+      response.status(404);
+      response.send(
+        {
+          error: "Entry not found",
+        });
+    }
+    else
+    {
+      response.send({});
+    }
+  })
+  .catch(console.error);
 });
 
 export default router;
