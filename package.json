@@ -6,20 +6,27 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && node --experimental-specifier-resolution=node --harmony-top-level-await bin/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --detectOpenHandles --forceExit --coverage"
   },
-  "author": "Karl Felix Beecken, Vincent Woltmann",
+  "jest": {
+    "verbose": true,
+    "preset": "ts-jest"
+  },
+  "author": "Karl Felix Beecken, Vincent Woltmann, Jonathan Fritz",
   "license": "ISC",
   "devDependencies": {
+    "jest": "^26.0.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "^26.1.0",
     "typescript": "^3.9.5"
   },
   "dependencies": {
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.6",
+    "@types/jest": "^26.0.0",
     "@types/mongodb": "^3.5.20",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "jest": "^26.0.1",
     "mongodb": "^3.5.9"
   }
 }
