@@ -48,9 +48,24 @@ describe("Send incorrect request", () => {
             .set('Accept', 'application/json')
             .expect(404, done);
     });
-    it('and fail to patch City', function (done) {
+    it('and fail to patch non-exisiting City', function (done) {
         request('http://localhost:3001')
-            .patch('/entries/berlin')
+            .patch('/entries/Bielefeld')
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .expect(404, done);
+    });
+    it('and fail to patch exisiting City', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .expect(400, done);
+    });
+    it('and fail to patch with no parameters', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({})
             .set('Accept', 'application/json')
             .expect(400, done);
     });
