@@ -25,6 +25,12 @@ describe("Send correct request", () => {
             .set('Accept', 'application/json')
             .expect(200, done);
     });
+    it('and get City case insensitive', function (done) {
+        request('http://localhost:3001')
+            .get('/entries/Berlin')
+            .set('Accept', 'application/json')
+            .expect(200, done);
+    }); 
     it('and patch City', function (done) {
         request('http://localhost:3001')
             .patch('/entries/berlin')
