@@ -12,7 +12,7 @@ describe("Move fast", () => {
             .expect(404, done);
     });
 });
-describe("Send request", () => {
+describe("Send correct request", () => {
     it('and create City', function (done) {
         request('http://localhost:3001')
             .put('/entries/berlin')
@@ -24,6 +24,35 @@ describe("Send request", () => {
             .get('/entries/berlin')
             .set('Accept', 'application/json')
             .expect(200, done);
+    });
+    it('and patch City', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/berlin')
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .expect(200, done);
+    });
+});
+
+describe("Send incorrect request", () => {
+    it('and fail to create City', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .expect(400, done);
+    });
+    it('and fail to get City, get 404 not found', function (done) {
+        request('http://localhost:3001')
+            .get('/entries/Bielefeld')
+            .set('Accept', 'application/json')
+            .expect(404, done);
+    });
+    it('and fail to patch City', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/berlin')
+            .set('Accept', 'application/json')
+            .expect(400, done);
     });
 });
 
