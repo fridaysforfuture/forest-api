@@ -1,7 +1,9 @@
 import express from 'express';
 import BodyParser from 'body-parser';
 import { entries } from '../dbHandler';
+import jwt from 'express-jwt';
 import cors from 'cors';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -18,48 +20,57 @@ function testParams(body: any) {
   }
 }
 
+const key = fs.readFileSync('key.rs');
 router.use(BodyParser.json());
-router.put('/:name', (request, response) => {
-  console.log("New entry: %s", request.params.name);
+router.put('/:name',
+  jwt({
+    secret: key
+  }),
+  (request, response) => {
+    console.log("New entry: %s", request.params.name);
 
-  if(request.body.links == undefined) {
-    request.body.links = [];
-  }
-  if(request.body.socialLinks == undefined) {
-    request.body.socialLinks = {};
-  }
-  if(request.body.friendlyName == undefined) {
-    request.body.friendlyName = request.params.name
-  }
-  try
-  {
-    testParams(request.body);
-  }
-  catch (error)
-  {
-    response.status(400);
-    response.send({ error });
-    return;
-  }
+    if(request.body.links == undefined) {
+      request.body.links = [];
+    }
+    if(request.body.socialLinks == undefined) {
+      request.body.socialLinks = {};
+    }
+    if(request.body.friendlyName == undefined) {
+      request.body.friendlyName = request.params.name
+    }
+    try
+    {
+      testParams(request.body);
+    }
+    catch (error)
+    {
+      response.status(400);
+      response.send({ error });
+      return;
+    }
 
-  entries.updateOne(
-    {
-      name: request.params.name.toLowerCase(),
-    },
-    {
-      $set: {
-        links: request.body.links,
-        socialLinks: request.body.socialLinks,
-        friendlyName: request.body.friendlyName,
+    entries.updateOne(
+      {
+        name: request.params.name.toLowerCase(),
       },
-    },
-    { upsert: true });
+      {
+        $set: {
+          links: request.body.links,
+          socialLinks: request.body.socialLinks,
+          friendlyName: request.body.friendlyName,
+        },
+      },
+      { upsert: true });
 
-  // Always send valid JSON!
-  response.send({});
-});
+    // Always send valid JSON!
+    response.send({});
+  });
 
-router.patch('/:name', (request, response) => {
+router.patch('/:name',
+  jwt({
+    secret: key
+  }),
+  (request, response) => {
   try
   {
     testParams(request.body);
