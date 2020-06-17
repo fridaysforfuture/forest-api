@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && node --experimental-specifier-resolution=node --harmony-top-level-await bin/index.js",
-    "test": "jest"
+    "test": "jest --detectOpenHandles --forceExit --coverage"
   },
   "jest": {
     "verbose": true,
@@ -16,6 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^26.0.1",
+    "supertest": "^4.0.2",
     "ts-jest": "^26.1.0",
     "typescript": "^3.9.5"
   },
