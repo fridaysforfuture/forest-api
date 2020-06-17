@@ -112,4 +112,16 @@ router.patch('/:name', (request, response) => {
   .catch(console.error);
 });
 
+router.get('/:name', async (request, response) => {
+  const entry = await entries.findOne({ name: request.params.name.toLowerCase() });
+  if(entry === null) {
+    response.status(404);
+    response.send({
+      error: 'Entry does not exist'
+    });
+    return;
+  }
+  entry._id = undefined;
+  response.send(entry);
+});
 export default router;
