@@ -10,8 +10,6 @@
   },
   "jest": {
     "verbose": true,
-    "module": "esnext",
-    "target": "es2020",
     "preset": "ts-jest"
   },
   "author": "Karl Felix Beecken, Vincent Woltmann, Jonathan Fritz",
