@@ -21,6 +21,10 @@ describe("Send correct request", () => {
     });
     it('and get City', function (done) {
         request('http://localhost:3001')
+            .put('/entries/berlin')
+            .set('Accept', 'application/json')
+            .expect(200, done);
+        request('http://localhost:3001')
             .get('/entries/berlin')
             .set('Accept', 'application/json')
             .expect(200, done);
@@ -32,6 +36,10 @@ describe("Send correct request", () => {
             .expect(200, done);
     }); 
     it('and patch City', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .set('Accept', 'application/json')
+            .expect(200, done);
         request('http://localhost:3001')
             .patch('/entries/berlin')
             .send({ links: [], socialLinks: {}, friendlyName: 'test' })
@@ -63,12 +71,20 @@ describe("Send incorrect request", () => {
     });
     it('and fail to patch exisiting City', function (done) {
         request('http://localhost:3001')
+            .put('/entries/berlin')
+            .set('Accept', 'application/json')
+            .expect(200, done);
+        request('http://localhost:3001')
             .patch('/entries/Berlin')
             .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .expect(400, done);
     });
     it('and fail to patch with no parameters', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .set('Accept', 'application/json')
+            .expect(200, done);
         request('http://localhost:3001')
             .patch('/entries/Berlin')
             .send({})
