@@ -6,7 +6,7 @@ const app = require('../src/index')
  */
 
 /**
- * Berlin muss exisitieren
+ * Berlin muss existieren
  */
 beforeAll(async () => {
     await request('http://localhost:3001')
