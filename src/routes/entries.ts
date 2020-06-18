@@ -1,9 +1,8 @@
 import express from 'express';
 import BodyParser from 'body-parser';
 import { entries } from '../dbHandler';
-import jwt from 'express-jwt';
+import { needAuth } from '../auth';
 import cors from 'cors';
-import fs from 'fs';
 
 const router = express.Router();
 
@@ -20,12 +19,8 @@ function testParams(body: any) {
   }
 }
 
-const key = fs.readFileSync('key.rs');
 router.use(BodyParser.json());
-router.put('/:name',
-  jwt({
-    secret: key
-  }),
+router.put('/:name', needAuth,
   (request, response) => {
     console.log("New entry: %s", request.params.name);
 
@@ -66,10 +61,7 @@ router.put('/:name',
     response.send({});
   });
 
-router.patch('/:name',
-  jwt({
-    secret: key
-  }),
+router.patch('/:name', needAuth,
   (request, response) => {
   try
   {
