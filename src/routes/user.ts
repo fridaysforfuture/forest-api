@@ -13,12 +13,15 @@ router.get('/:name', needAuth,
       response.status(401).send({ error: 'You can only get your own user' });
       return;
     }
-   response.send(
-      await entries.find(
+    const ownEntries = await entries.find(
         { owner: request.params.name },
         { 
           projection: { _id: false },
-        }).toArray());
+        });
+    response.send({
+      ownEntries,
+      username: request.params.name
+    });
   });
 
 export default router;
