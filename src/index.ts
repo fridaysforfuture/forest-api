@@ -1,5 +1,6 @@
 import express from 'express';
 import entries from './routes/entries';
+import user from './routes/user';
 
 /**
  * Spins up a express server
@@ -20,6 +21,7 @@ export default class App {
     startServer = () => {
         console.log('Starting!')
         this.server.use('/entries', entries);
+        this.server.use('/user', user);
         this.server.listen(3001);
     }
 }
