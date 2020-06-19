@@ -12,10 +12,6 @@ const jwt = require('jsonwebtoken');
  * But hey!!!!!! Test coverage!
  */
 
-/**
- * Berlin muss existieren
- */
-
 async function generateKeys() {
     const { publicKey, privateKey } = await generateKeyPair('rsa', {
       modulusLength: 2048,
@@ -35,8 +31,13 @@ async function generateKeys() {
 }
 
 async function getKeys() {
-    return await Promise.all([
-      fs.readFile(PRIVATE_KEY_FILE), fs.readFile(PUBLIC_KEY_FILE)
+  /**
+   * We try to reuse old keys, because creating these keys is relatively
+   * expensive
+   */
+  return await Promise.all([
+    fs.readFile(PRIVATE_KEY_FILE),
+    fs.readFile(PUBLIC_KEY_FILE)
     ]).then(([privateKey, publicKey]) => ({ privateKey, publicKey }))
     .catch(generateKeys);
 }
@@ -44,6 +45,9 @@ async function getKeys() {
 
 let authHeader: any = null;
 beforeAll(async () => {
+  /**
+   * We generate our own Key-Pair to create our own jwt
+   */
   const keys = await getKeys();
   require('../src/index');
   const token = await jwt.sign({}, keys.privateKey, { algorithm: 'RS256' });
@@ -51,6 +55,10 @@ beforeAll(async () => {
   authHeader = {
     'Authorization': `Bearer ${token}`,
   };
+
+  /**
+   * Berlin muss existieren
+   */
 
   await request('http://localhost:3001')
         .put('/entries/berlin')
