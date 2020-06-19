@@ -22,8 +22,6 @@ function testParams(body: any) {
 router.use(BodyParser.json());
 router.put('/:name', needAuth,
   (request, response) => {
-    console.log("New entry: %s", request.params.name);
-
     if(request.body.links == undefined) {
       request.body.links = [];
     }
@@ -32,6 +30,11 @@ router.put('/:name', needAuth,
     }
     if(request.body.friendlyName == undefined) {
       request.body.friendlyName = request.params.name
+    }
+    if(typeof(request.user!.username) !== 'string') {
+      response.status(400);
+      response.send({ error: "Token does not have string username claim" });
+      return;
     }
     try
     {
@@ -53,9 +56,11 @@ router.put('/:name', needAuth,
           links: request.body.links,
           socialLinks: request.body.socialLinks,
           friendlyName: request.body.friendlyName,
+          owner: request.user!.username
         },
       },
       { upsert: true });
+    console.log("New entry: %s", request.params.name);
 
     // Always send valid JSON!
     response.send({});
