@@ -1,6 +1,7 @@
 import express from 'express';
 import BodyParser from 'body-parser';
 import { entries } from '../dbHandler';
+import { needAuth } from '../auth';
 import cors from 'cors';
 
 const router = express.Router();
@@ -19,47 +20,54 @@ function testParams(body: any) {
 }
 
 router.use(BodyParser.json());
-router.put('/:name', (request, response) => {
-  console.log("New entry: %s", request.params.name);
-
-  if(request.body.links == undefined) {
-    request.body.links = [];
-  }
-  if(request.body.socialLinks == undefined) {
-    request.body.socialLinks = {};
-  }
-  if(request.body.friendlyName == undefined) {
-    request.body.friendlyName = request.params.name
-  }
-  try
-  {
-    testParams(request.body);
-  }
-  catch (error)
-  {
-    response.status(400);
-    response.send({ error });
-    return;
-  }
-
-  entries.updateOne(
+router.put('/:name', needAuth,
+  (request, response) => {
+    if(request.body.links == undefined) {
+      request.body.links = [];
+    }
+    if(request.body.socialLinks == undefined) {
+      request.body.socialLinks = {};
+    }
+    if(request.body.friendlyName == undefined) {
+      request.body.friendlyName = request.params.name
+    }
+    if(typeof(request.user!.username) !== 'string') {
+      response.status(401);
+      response.send({ error: "Token does not have string username claim" });
+      return;
+    }
+    try
     {
-      name: request.params.name.toLowerCase(),
-    },
+      testParams(request.body);
+    }
+    catch (error)
     {
-      $set: {
-        links: request.body.links,
-        socialLinks: request.body.socialLinks,
-        friendlyName: request.body.friendlyName,
+      response.status(400);
+      response.send({ error });
+      return;
+    }
+
+    entries.updateOne(
+      {
+        name: request.params.name.toLowerCase(),
       },
-    },
-    { upsert: true });
+      {
+        $set: {
+          links: request.body.links,
+          socialLinks: request.body.socialLinks,
+          friendlyName: request.body.friendlyName,
+          owner: request.user!.username
+        },
+      },
+      { upsert: true });
+    console.log("New entry: %s", request.params.name);
 
-  // Always send valid JSON!
-  response.send({});
-});
+    // Always send valid JSON!
+    response.send({});
+  });
 
-router.patch('/:name', (request, response) => {
+router.patch('/:name', needAuth,
+  (request, response) => {
   try
   {
     testParams(request.body);
