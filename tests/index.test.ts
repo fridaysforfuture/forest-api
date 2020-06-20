@@ -44,17 +44,28 @@ async function getKeys() {
 
 
 let authHeader: any = null;
+let authHeaderNoUsername: any = null;
 beforeAll(async () => {
   /**
    * We generate our own Key-Pair to create our own jwt
    */
   const keys = await getKeys();
   require('../src/index');
-  const token = await jwt.sign({}, keys.privateKey, { algorithm: 'RS256' });
+  const token = await jwt.sign({
+      username: 'test_user'
+    },
+    keys.privateKey,
+    { algorithm: 'RS256' });
+  const tokenNoUsername = await jwt.sign({},
+    keys.privateKey,
+    { algorithm: 'RS256' });
 
   authHeader = {
     'Authorization': `Bearer ${token}`,
   };
+  authHeaderNoUsername = {
+    'Authorization': `Bearer ${tokenNoUsername}`,
+  }
 
   /**
    * Berlin muss existieren
@@ -98,7 +109,7 @@ describe("Send correct request", () => {
 });
 
 describe("Send incorrect request", () => {
-    it('and fail to create City', function (done) {
+    it('and fail to create City because of malformed parameters', function (done) {
         request('http://localhost:3001')
             .put('/entries/berlin')
             .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
@@ -106,6 +117,21 @@ describe("Send incorrect request", () => {
             .set(authHeader)
             .expect(400, done);
     });
+    it('and fail to create City because of missing auth', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .send({ links: [], socialLinks: {}, friendlyName: 'test'})
+            .set('Accept', 'application/json')
+            .expect(401, done);
+    });
+    it('and fail to create City because of missing claim', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .send({ links: [], socialLinks: {}, friendlyName: 'test'})
+            .set('Accept', 'application/json')
+            .set(authHeaderNoUsername)
+            .expect(401, done);
+    });  
     it('and fail to get City, get 404 not found', function (done) {
         request('http://localhost:3001')
             .get('/entries/Bielefeld')
@@ -120,13 +146,20 @@ describe("Send incorrect request", () => {
             .set(authHeader)
             .expect(404, done);
     });
-    it('and fail to patch exisiting City', function (done) {
+    it('and fail to patch exisiting City with wrong parameters', function (done) {
         request('http://localhost:3001')
             .patch('/entries/Berlin')
             .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .set(authHeader)
             .expect(400, done);
+    });
+    it('and fail to patch exisiting City with missing auth', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .expect(401, done);
     });
     it('and fail to patch with no parameters', function (done) {
         request('http://localhost:3001')
@@ -181,4 +214,31 @@ describe("Do body param testing:", () => {
         console.log(response.body)
         done()
     });
+});
+
+describe("Testing /user endpoint", () => {
+    it('Getting all entries', async function (done) {
+        const response = await request('http://localhost:3001')
+            .get('/user/test_user')
+            .set(authHeader)
+            .set('Accept', 'application/json');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+          ownEntries: [
+            {
+              links: [],
+              name: "berlin",
+            }
+          ]
+        });
+        done()
+    }); 
+  it('Fail to get entries from somebody else', async function (done) {
+      request('http://localhost:3001')
+          .get('/user/admin')
+          .set(authHeader)
+          .set('Accept', 'application/json')
+          .expect(401, done);
+  });
 });

@@ -17,7 +17,8 @@ router.get('/:name', needAuth,
         { owner: request.params.name },
         { 
           projection: { _id: false },
-        });
+        }).toArray();
+    console.log(ownEntries);
     response.send({
       ownEntries,
       username: request.params.name

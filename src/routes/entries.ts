@@ -32,7 +32,7 @@ router.put('/:name', needAuth,
       request.body.friendlyName = request.params.name
     }
     if(typeof(request.user!.username) !== 'string') {
-      response.status(400);
+      response.status(401);
       response.send({ error: "Token does not have string username claim" });
       return;
     }
