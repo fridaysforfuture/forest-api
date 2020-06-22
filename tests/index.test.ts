@@ -45,6 +45,7 @@ async function getKeys() {
 
 let authHeader: any = null;
 let authHeaderNoUsername: any = null;
+let authHeaderDifferentUser: any = null;
 beforeAll(async () => {
   /**
    * We generate our own Key-Pair to create our own jwt
@@ -59,12 +60,20 @@ beforeAll(async () => {
   const tokenNoUsername = await jwt.sign({},
     keys.privateKey,
     { algorithm: 'RS256' });
+  const tokenDifferentUser = await jwt.sign({
+      username: 'other_user'
+    },
+    keys.privateKey,
+    { algorithm: 'RS256' });
 
   authHeader = {
     'Authorization': `Bearer ${token}`,
   };
   authHeaderNoUsername = {
     'Authorization': `Bearer ${tokenNoUsername}`,
+  }
+  authHeaderDifferentUser = {
+    'Authorization': `Bearer ${tokenDifferentUser}`,
   }
 
   /**
@@ -85,7 +94,14 @@ describe("Move fast", () => {
     });
 });
 describe("Send correct request", () => {
-    it('and create City', function (done) {
+    it('and create new City', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin2')
+            .set('Accept', 'application/json')
+            .set(authHeaderDifferentUser)
+            .expect(200, done);
+    });
+    it('and create exisiting City', function (done) {
         request('http://localhost:3001')
             .put('/entries/berlin')
             .set('Accept', 'application/json')
@@ -135,11 +151,19 @@ describe("Send incorrect request", () => {
     it('and fail to create City because of missing claim', function (done) {
         request('http://localhost:3001')
             .put('/entries/berlin')
-            .send({ links: [], socialLinks: {}, friendlyName: 'test'})
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .set(authHeaderNoUsername)
             .expect(401, done);
-    });  
+    });
+    it('and fail to create City becaue of wrong user', function (done) {
+        request('http://localhost:3001')
+            .put('/entries/berlin')
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
+            .set('Accept', 'application/json')
+            .set(authHeaderDifferentUser)
+            .expect(401, done);
+    });
     it('and fail to get City, get 404 not found', function (done) {
         request('http://localhost:3001')
             .get('/entries/Bielefeld')
@@ -165,10 +189,18 @@ describe("Send incorrect request", () => {
     it('and fail to patch exisiting City with missing auth', function (done) {
         request('http://localhost:3001')
             .patch('/entries/Berlin')
-            .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .expect(401, done);
     });
+    it('and fail to patch existing City from different user', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({})
+            .set('Accept', 'application/json')
+            .set(authHeaderDifferentUser)
+            .expect(401, done);
+    })
 });
 
 describe("Do body param testing:", () => {
