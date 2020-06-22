@@ -102,7 +102,9 @@ router.patch('/:name', needAuth,
 });
 
 router.get('/:name', async (request, response) => {
-  const entry = await Entry.findOne({ name: request.params.name.toLowerCase() });
+  const entry = await Entry.findOne(
+    { name: request.params.name.toLowerCase() },
+    { _id: false });
   if(entry === null) {
     response.status(404);
     response.send({
@@ -110,7 +112,6 @@ router.get('/:name', async (request, response) => {
     });
     return;
   }
-  entry._id = undefined;
   response.send(entry);
 });
 export default router;
