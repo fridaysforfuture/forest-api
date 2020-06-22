@@ -105,7 +105,15 @@ describe("Send correct request", () => {
             .set('Accept', 'application/json')
             .set(authHeader)
             .expect(200, done);
-    });
+    }); 
+    it('and patch with no parameters', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({})
+            .set('Accept', 'application/json')
+            .set(authHeader)
+            .expect(200, done);
+    }); 
 });
 
 describe("Send incorrect request", () => {
@@ -160,14 +168,6 @@ describe("Send incorrect request", () => {
             .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .expect(401, done);
-    });
-    it('and fail to patch with no parameters', function (done) {
-        request('http://localhost:3001')
-            .patch('/entries/Berlin')
-            .send({})
-            .set('Accept', 'application/json')
-            .set(authHeader)
-            .expect(400, done);
     });
 });
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import BodyParser from 'body-parser';
-import { entries } from '../dbHandler';
+import Entry from '../Entry';
 import { needAuth } from '../auth';
 import cors from 'cors';
 
@@ -46,8 +46,8 @@ router.put('/:name', needAuth,
       response.send({ error });
       return;
     }
-
-    entries.updateOne(
+    
+    Entry.updateOne(
       {
         name: request.params.name.toLowerCase(),
       },
@@ -67,7 +67,7 @@ router.put('/:name', needAuth,
   });
 
 router.patch('/:name', needAuth,
-  (request, response) => {
+  async (request, response) => {
   try
   {
     testParams(request.body);
@@ -78,50 +78,31 @@ router.patch('/:name', needAuth,
     response.send({ error });
     return;
   }
-  let changeSet : any = {};
-  if(request.body.links !== undefined) {
-    changeSet.links = request.body.links;
-  }
-  if(request.body.socialLinks !== undefined) {
-    changeSet.socialLink = request.body.socialLinks;
-  }
-  if(request.body.friendlyName !== undefined) {
-    changeSet.friendlyName = request.body.friendlyName;
-  }
-  if(Object.keys(changeSet).length === 0) {
-    response.status(400);
+
+  const entry = await Entry.findOne({
+    name: request.params.name.toLowerCase()
+  });
+
+  if(entry === null) {
+    response.status(404);
     response.send({
-      error: "PATCH needs a parameter",
+        error: "Entry not found",
     });
     return;
-  };
-  entries.updateOne(
-    {
-      name: request.params.name.toLowerCase()
-    },
-    {
-      $set: changeSet,
-    }
-  ).then((result) => {
-    if(result.modifiedCount === 0)
-    {
-      // Nothing was found
-      response.status(404);
-      response.send(
-        {
-          error: "Entry not found",
-        });
-    }
-    else
-    {
-      response.send({});
-    }
-  })
-  .catch(console.error);
+  }
+
+  if(request.body.links !== undefined) {
+    entry.links = request.body.links;
+  }
+  if(request.body.friendlyName !== undefined) {
+    entry.friendlyName = request.body.friendlyName;
+  }
+  entry.save();
+  response.send({});
 });
 
 router.get('/:name', async (request, response) => {
-  const entry = await entries.findOne({ name: request.params.name.toLowerCase() });
+  const entry = await Entry.findOne({ name: request.params.name.toLowerCase() });
   if(entry === null) {
     response.status(404);
     response.send({
