@@ -5,14 +5,15 @@ import mongooseNamespace from 'mongoose';
 export interface IEntry extends mongooseNamespace.Document {
   name: string;
   friendlyName: string;
-  lastName: string;
   links: Array<any>;
+  owner: string;
 }
 
 const EntrySchema = new mongooseNamespace.Schema({
   name: String,
   friendlyName: String,
-  links: Array
+  links: Array,
+  owner: String
 });
 
 export default mongoose.model<IEntry>('Entry', EntrySchema);

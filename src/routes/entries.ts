@@ -21,7 +21,7 @@ function testParams(body: any) {
 
 router.use(BodyParser.json());
 router.put('/:name', needAuth,
-  (request, response) => {
+  async (request, response) => {
     if(request.body.links == undefined) {
       request.body.links = [];
     }
@@ -47,22 +47,30 @@ router.put('/:name', needAuth,
       return;
     }
     
-    Entry.updateOne(
-      {
+    const entry = await Entry.findOne( {
         name: request.params.name.toLowerCase(),
-      },
-      {
-        $set: {
-          links: request.body.links,
-          socialLinks: request.body.socialLinks,
-          friendlyName: request.body.friendlyName,
-          owner: request.user!.username
-        },
-      },
-      { upsert: true });
-    console.log("New entry: %s", request.params.name);
-
-    // Always send valid JSON!
+      });
+    if(entry === null) {
+      new Entry({
+        name: request.params.name,
+        links: request.body.links,
+        socialLinks: request.body.socialLinks,
+        friendlyName: request.body.friendlyName,
+        owner: request.user!.username
+      }).save();
+      response.send({});
+      return;
+    }
+    if(entry.owner !== request.user!.username) {
+      response.status(401);
+      response.send({
+        error: "Entry already exists and is owned by different user"
+      });
+      return
+    }
+    entry.links = request.body.links;
+    entry.friendlyName = request.body.friendlyName;
+    entry.save();
     response.send({});
   });
 
