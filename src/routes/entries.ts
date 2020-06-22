@@ -98,6 +98,13 @@ router.patch('/:name', needAuth,
     });
     return;
   }
+  if(entry.owner !== request.user!.username) {
+    response.status(401);
+    response.send({
+        error: "Entry is owned by different user",
+    });
+    return;
+  }
 
   if(request.body.links !== undefined) {
     entry.links = request.body.links;

@@ -189,10 +189,18 @@ describe("Send incorrect request", () => {
     it('and fail to patch exisiting City with missing auth', function (done) {
         request('http://localhost:3001')
             .patch('/entries/Berlin')
-            .send({ links: 'not an array', socialLinks: {}, friendlyName: 'test' })
+            .send({ links: [], socialLinks: {}, friendlyName: 'test' })
             .set('Accept', 'application/json')
             .expect(401, done);
     });
+    it('and fail to patch existing City from different user', function (done) {
+        request('http://localhost:3001')
+            .patch('/entries/Berlin')
+            .send({})
+            .set('Accept', 'application/json')
+            .set(authHeaderDifferentUser)
+            .expect(401, done);
+    })
 });
 
 describe("Do body param testing:", () => {
