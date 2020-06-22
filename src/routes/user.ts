@@ -1,5 +1,5 @@
 import express from 'express';
-import { entries } from '../dbHandler';
+import Entry from '../Entry';
 import { needAuth } from '../auth';
 import cors from 'cors';
 
@@ -13,11 +13,11 @@ router.get('/:name', needAuth,
       response.status(401).send({ error: 'You can only get your own user' });
       return;
     }
-    const ownEntries = await entries.find(
+    const ownEntries = await Entry.find(
         { owner: request.params.name },
         { 
-          projection: { _id: false },
-        }).toArray();
+          _id: false,
+        });
     console.log(ownEntries);
     response.send({
       ownEntries,
