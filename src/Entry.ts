@@ -5,7 +5,7 @@ import mongooseNamespace from 'mongoose';
 export interface IEntry extends mongooseNamespace.Document {
   name: string;
   friendlyName: string;
-  links: Array<any>;
+  links: Array<{ url: string; text: string }>;
   owner: string;
 }
 

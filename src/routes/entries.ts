@@ -7,7 +7,7 @@ import cors from 'cors';
 const router = express.Router();
 
 router.use(cors());
-function testParams(body: any) {
+function testParams(body: Record<string, unknown>) {
   if (body.links !== undefined && !Array.isArray(body.links)) {
     throw 'links is not an array';
   }
@@ -33,7 +33,7 @@ router.put('/:name', needAuth, async (request, response) => {
   if (request.body.friendlyName == undefined) {
     request.body.friendlyName = request.params.name;
   }
-  if (typeof request.user!.username !== 'string') {
+  if (typeof request.user.username !== 'string') {
     response.status(401);
     response.send({ error: 'Token does not have string username claim' });
     return;
@@ -55,12 +55,12 @@ router.put('/:name', needAuth, async (request, response) => {
       links: request.body.links,
       socialLinks: request.body.socialLinks,
       friendlyName: request.body.friendlyName,
-      owner: request.user!.username,
+      owner: request.user.username,
     }).save();
     response.send({});
     return;
   }
-  if (entry.owner !== request.user!.username) {
+  if (entry.owner !== request.user.username) {
     response.status(401);
     response.send({
       error: 'Entry already exists and is owned by different user',
@@ -93,7 +93,7 @@ router.patch('/:name', needAuth, async (request, response) => {
     });
     return;
   }
-  if (entry.owner !== request.user!.username) {
+  if (entry.owner !== request.user.username) {
     response.status(401);
     response.send({
       error: 'Entry is owned by different user',

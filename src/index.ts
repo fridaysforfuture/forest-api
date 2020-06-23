@@ -10,15 +10,11 @@ export default class App {
    * Express app
    */
   server = express();
-  /**
-   * Constructor
-   */
-  constructor() {}
 
   /**
    * Start server
    */
-  startServer = () => {
+  startServer = (): void => {
     console.log('Starting!');
     this.server.use('/entries', entries);
     this.server.use('/user', user);
