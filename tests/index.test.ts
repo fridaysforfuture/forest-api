@@ -56,17 +56,17 @@ beforeAll(async () => {
    */
   const keys = await getKeys();
   require('../src/index');
-  const token = await jwt.sign(
+  const token = jwt.sign(
     {
       username: 'test_user',
     },
     keys.privateKey,
     { algorithm: 'RS256' },
   );
-  const tokenNoUsername = await jwt.sign({}, keys.privateKey, {
+  const tokenNoUsername = jwt.sign({}, keys.privateKey, {
     algorithm: 'RS256',
   });
-  const tokenDifferentUser = await jwt.sign(
+  const tokenDifferentUser = jwt.sign(
     {
       username: 'other_user',
     },
