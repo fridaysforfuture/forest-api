@@ -8,108 +8,103 @@ const router = express.Router();
 
 router.use(cors());
 function testParams(body: any) {
-   if(body.links !== undefined && !Array.isArray(body.links)) {
+  if (body.links !== undefined && !Array.isArray(body.links)) {
     throw 'links is not an array';
   }
-  if(body.socialLinks !== undefined && typeof(body.socialLinks) !== 'object') {
+  if (body.socialLinks !== undefined && typeof body.socialLinks !== 'object') {
     throw 'socialLinks is not an object';
   }
-  if(body.friendlyName !== undefined && typeof(body.friendlyName) !== 'string') {
+  if (
+    body.friendlyName !== undefined &&
+    typeof body.friendlyName !== 'string'
+  ) {
     throw 'friendlyName is not a string';
   }
 }
 
 router.use(BodyParser.json());
-router.put('/:name', needAuth,
-  async (request, response) => {
-    if(request.body.links == undefined) {
-      request.body.links = [];
-    }
-    if(request.body.socialLinks == undefined) {
-      request.body.socialLinks = {};
-    }
-    if(request.body.friendlyName == undefined) {
-      request.body.friendlyName = request.params.name
-    }
-    if(typeof(request.user!.username) !== 'string') {
-      response.status(401);
-      response.send({ error: "Token does not have string username claim" });
-      return;
-    }
-    try
-    {
-      testParams(request.body);
-    }
-    catch (error)
-    {
-      response.status(400);
-      response.send({ error });
-      return;
-    }
-    
-    const entry = await Entry.findOne( {
-        name: request.params.name.toLowerCase(),
-      });
-    if(entry === null) {
-      new Entry({
-        name: request.params.name,
-        links: request.body.links,
-        socialLinks: request.body.socialLinks,
-        friendlyName: request.body.friendlyName,
-        owner: request.user!.username
-      }).save();
-      response.send({});
-      return;
-    }
-    if(entry.owner !== request.user!.username) {
-      response.status(401);
-      response.send({
-        error: "Entry already exists and is owned by different user"
-      });
-      return
-    }
-    entry.links = request.body.links;
-    entry.friendlyName = request.body.friendlyName;
-    entry.save();
-    response.send({});
-  });
-
-router.patch('/:name', needAuth,
-  async (request, response) => {
-  try
-  {
-    testParams(request.body);
+router.put('/:name', needAuth, async (request, response) => {
+  if (request.body.links == undefined) {
+    request.body.links = [];
   }
-  catch (error)
-  {
+  if (request.body.socialLinks == undefined) {
+    request.body.socialLinks = {};
+  }
+  if (request.body.friendlyName == undefined) {
+    request.body.friendlyName = request.params.name;
+  }
+  if (typeof request.user!.username !== 'string') {
+    response.status(401);
+    response.send({ error: 'Token does not have string username claim' });
+    return;
+  }
+  try {
+    testParams(request.body);
+  } catch (error) {
     response.status(400);
     response.send({ error });
     return;
   }
 
   const entry = await Entry.findOne({
-    name: request.params.name.toLowerCase()
+    name: request.params.name.toLowerCase(),
   });
-
-  if(entry === null) {
-    response.status(404);
-    response.send({
-        error: "Entry not found",
-    });
+  if (entry === null) {
+    new Entry({
+      name: request.params.name,
+      links: request.body.links,
+      socialLinks: request.body.socialLinks,
+      friendlyName: request.body.friendlyName,
+      owner: request.user!.username,
+    }).save();
+    response.send({});
     return;
   }
-  if(entry.owner !== request.user!.username) {
+  if (entry.owner !== request.user!.username) {
     response.status(401);
     response.send({
-        error: "Entry is owned by different user",
+      error: 'Entry already exists and is owned by different user',
+    });
+    return;
+  }
+  entry.links = request.body.links;
+  entry.friendlyName = request.body.friendlyName;
+  entry.save();
+  response.send({});
+});
+
+router.patch('/:name', needAuth, async (request, response) => {
+  try {
+    testParams(request.body);
+  } catch (error) {
+    response.status(400);
+    response.send({ error });
+    return;
+  }
+
+  const entry = await Entry.findOne({
+    name: request.params.name.toLowerCase(),
+  });
+
+  if (entry === null) {
+    response.status(404);
+    response.send({
+      error: 'Entry not found',
+    });
+    return;
+  }
+  if (entry.owner !== request.user!.username) {
+    response.status(401);
+    response.send({
+      error: 'Entry is owned by different user',
     });
     return;
   }
 
-  if(request.body.links !== undefined) {
+  if (request.body.links !== undefined) {
     entry.links = request.body.links;
   }
-  if(request.body.friendlyName !== undefined) {
+  if (request.body.friendlyName !== undefined) {
     entry.friendlyName = request.body.friendlyName;
   }
   entry.save();
@@ -119,11 +114,12 @@ router.patch('/:name', needAuth,
 router.get('/:name', async (request, response) => {
   const entry = await Entry.findOne(
     { name: request.params.name.toLowerCase() },
-    { _id: false });
-  if(entry === null) {
+    { _id: false },
+  );
+  if (entry === null) {
     response.status(404);
     response.send({
-      error: 'Entry does not exist'
+      error: 'Entry does not exist',
     });
     return;
   }

@@ -9,7 +9,7 @@ if (process.env.KEY_FILE === undefined) {
 }
 const publicKey = fs.readFileSync(process.env.KEY_FILE);
 const needAuth = jwt({
-  secret: publicKey
+  secret: publicKey,
 });
 
 export { needAuth };

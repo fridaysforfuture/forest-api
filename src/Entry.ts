@@ -13,7 +13,7 @@ const EntrySchema = new mongooseNamespace.Schema({
   name: String,
   friendlyName: String,
   links: Array,
-  owner: String
+  owner: String,
 });
 
 export default mongoose.model<IEntry>('Entry', EntrySchema);
