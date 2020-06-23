@@ -1,12 +1,16 @@
-const request = require('supertest');
+import request = require('supertest');
 
 const PUBLIC_KEY_FILE = 'tests/key.pub';
 const PRIVATE_KEY_FILE = 'tests/key.priv';
 process.env.KEY_FILE = PUBLIC_KEY_FILE;
-const fs = require('fs').promises;
-const { promisify } = require('util');
-const generateKeyPair = promisify(require('crypto').generateKeyPair);
-const jwt = require('jsonwebtoken');
+import fsImport = require('fs');
+const fs = fsImport.promises;
+import util = require('util');
+const promisify = util.promisify;
+
+import crypto = require('crypto');
+const generateKeyPair = promisify(crypto.generateKeyPair);
+import jwt = require('jsonwebtoken');
 /**
  * Currently, we are only looking for valid responses.
  * But hey!!!!!! Test coverage!
@@ -43,9 +47,9 @@ async function getKeys() {
     .catch(generateKeys);
 }
 
-let authHeader: any = null;
-let authHeaderNoUsername: any = null;
-let authHeaderDifferentUser: any = null;
+let authHeader: { Authorization: string };
+let authHeaderNoUsername: { Authorization: string };
+let authHeaderDifferentUser: { Authorization: string };
 beforeAll(async () => {
   /**
    * We generate our own Key-Pair to create our own jwt
