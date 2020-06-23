@@ -29,6 +29,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mongodb": "^3.5.20",
     "@types/mongoose": "^5.7.27",
+    "@types/supertest": "^2.0.9",
     "@typescript-eslint/parser": "^3.4.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
