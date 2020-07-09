@@ -6,6 +6,7 @@ export interface ISocialLinks extends mongooseNamespace.Document {
   instagram: string | null;
   twitter: string | null;
   facebook: string | null;
+  website: string | null;
 }
 export interface IEntry extends mongooseNamespace.Document {
   name: string;
@@ -20,7 +21,10 @@ const EntrySchema = new mongooseNamespace.Schema({
   friendlyName: String,
   links: Array,
   owner: String,
-  socialLinks: Object
+  socialLinks: {
+    type: Object,
+    required: true,
+  },
 });
 
 export default mongoose.model<IEntry>('Entry', EntrySchema);
