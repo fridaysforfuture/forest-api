@@ -9,6 +9,7 @@ if (process.env.KEY_FILE === undefined) {
 }
 const publicKey = fs.readFileSync(process.env.KEY_FILE);
 const needAuth = jwt({
+  algorithms: ['HS256', 'RS256'],
   secret: publicKey
 });
 
