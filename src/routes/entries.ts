@@ -55,12 +55,12 @@ router.put('/:name', needAuth, async (request, response) => {
       links: request.body.links,
       socialLinks: request.body.socialLinks,
       friendlyName: request.body.friendlyName,
-      owner: request.user.sub,
+      owner: request.user!.sub,
     }).save();
     response.send({});
     return;
   }
-  if (entry.owner !== request.user.sub) {
+  if (entry.owner !== request.user!.sub) {
     response.status(401);
     response.send({
       error: 'Entry already exists and is owned by different user',
@@ -69,6 +69,7 @@ router.put('/:name', needAuth, async (request, response) => {
   }
   entry.links = request.body.links;
   entry.friendlyName = request.body.friendlyName;
+  entry.socialLinks = request.body.socialLinks;
   entry.save();
   response.send({});
 });
@@ -97,11 +98,7 @@ router.patch('/:name', needAuth,
     });
     return;
   }
-<<<<<<< HEAD
-  if(entry.owner !== request.user!.username) {
-=======
-  if (entry.owner !== request.user.sub) {
->>>>>>> 785b5df... Changed username to sub
+  if (entry.owner !== request.user!.sub) {
     response.status(401);
     response.send({
         error: "Entry is owned by different user",
