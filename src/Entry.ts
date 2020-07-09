@@ -2,18 +2,25 @@ import { mongoose } from './mongooseConnection';
 // Get the namespace
 import mongooseNamespace from 'mongoose';
 
+export interface ISocialLinks extends mongooseNamespace.Document {
+  instagram: string | null;
+  twitter: string | null;
+  facebook: string | null;
+}
 export interface IEntry extends mongooseNamespace.Document {
   name: string;
   friendlyName: string;
   links: Array<any>;
   owner: string;
+  socialLinks: ISocialLinks;
 }
 
 const EntrySchema = new mongooseNamespace.Schema({
   name: String,
   friendlyName: String,
   links: Array,
-  owner: String
+  owner: String,
+  socialLinks: Object
 });
 
 export default mongoose.model<IEntry>('Entry', EntrySchema);
