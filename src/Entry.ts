@@ -25,6 +25,8 @@ const EntrySchema = new mongooseNamespace.Schema({
     type: Object,
     required: true,
   },
-});
+},
+{ minimize: false },
+);
 
 export default mongoose.model<IEntry>('Entry', EntrySchema);
