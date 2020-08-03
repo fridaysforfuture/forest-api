@@ -31,6 +31,9 @@ router.put('/:name', needAuth, async (request, response) => {
   if (request.body.friendlyName == undefined) {
     request.body.friendlyName = request.params.name;
   }
+  if (request.body.sharedTo == undefined) {
+    request.body.sharedTo = [];
+  }
   if (typeof request.user!.sub !== 'string') {
     response.status(401);
     response.send({ error: 'Token does not have string sub claim' });
@@ -56,6 +59,7 @@ router.put('/:name', needAuth, async (request, response) => {
       socialLinks: request.body.socialLinks,
       friendlyName: request.body.friendlyName,
       owner: request.user!.sub,
+      sharedTo: request.body.sharedTo,
     }).save();
     response.send({});
     return;
@@ -70,6 +74,7 @@ router.put('/:name', needAuth, async (request, response) => {
   entry.links = request.body.links;
   entry.friendlyName = request.body.friendlyName;
   entry.socialLinks = request.body.socialLinks;
+  entry.sharedTo = request.body.sharedTo;
   entry.save();
   response.send({});
 });
