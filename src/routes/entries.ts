@@ -31,6 +31,9 @@ router.put('/:name', needAuth, async (request, response) => {
   if (request.body.friendlyName == undefined) {
     request.body.friendlyName = request.params.name;
   }
+  if (request.body.sharedTo == undefined) {
+    request.body.sharedTo = [];
+  }
   if (typeof request.user!.sub !== 'string') {
     response.status(401);
     response.send({ error: 'Token does not have string sub claim' });
@@ -56,11 +59,13 @@ router.put('/:name', needAuth, async (request, response) => {
       socialLinks: request.body.socialLinks,
       friendlyName: request.body.friendlyName,
       owner: request.user!.sub,
+      sharedTo: request.body.sharedTo,
     }).save();
     response.send({});
     return;
   }
-  if (entry.owner !== request.user!.sub) {
+  if (entry.owner !== request.user!.sub &&
+      !entry.sharedTo.includes(request.user!.sub)) {
     response.status(401);
     response.send({
       error: 'Entry already exists and is owned by different user',
@@ -70,6 +75,12 @@ router.put('/:name', needAuth, async (request, response) => {
   entry.links = request.body.links;
   entry.friendlyName = request.body.friendlyName;
   entry.socialLinks = request.body.socialLinks;
+
+  // Only the owner is allowed to change the shared user.
+  if (entry.owner === request.user!.sub) {
+    entry.sharedTo = request.body.sharedTo;
+  }
+
   entry.save();
   response.send({});
 });
@@ -98,7 +109,8 @@ router.patch('/:name', needAuth,
     });
     return;
   }
-  if (entry.owner !== request.user!.sub) {
+  if (entry.owner !== request.user!.sub &&
+      !entry.sharedTo.includes(request.user!.sub)) {
     response.status(401);
     response.send({
         error: "Entry is owned by different user",
@@ -111,6 +123,9 @@ router.patch('/:name', needAuth,
   }
   if(request.body.friendlyName !== undefined) {
     entry.friendlyName = request.body.friendlyName;
+  }
+  if(request.body.sharedTo !== undefined && entry.owner === request.user!.sub) {
+    entry.sharedTo = request.body.sharedTo;
   }
   entry.save();
   response.send({});
