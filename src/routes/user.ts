@@ -17,9 +17,15 @@ router.get('/:name', needAuth, async (request, response) => {
     { owner: request.params.name },
     { _id: false, __v: false },
   );
+  const sharedEntries = await Entry.find(
+    { sharedTo: request.params.name },
+    { _id: false, __v: false },
+  );
+  console.log(sharedEntries);
   console.log(ownEntries);
   response.send({
     ownEntries,
+    sharedEntries,
     username: request.params.name,
   });
 });
