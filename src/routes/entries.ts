@@ -64,7 +64,8 @@ router.put('/:name', needAuth, async (request, response) => {
     response.send({});
     return;
   }
-  if (entry.owner !== request.user!.sub) {
+  if (entry.owner !== request.user!.sub &&
+      !entry.sharedTo.includes(request.user!.sub)) {
     response.status(401);
     response.send({
       error: 'Entry already exists and is owned by different user',
@@ -74,7 +75,12 @@ router.put('/:name', needAuth, async (request, response) => {
   entry.links = request.body.links;
   entry.friendlyName = request.body.friendlyName;
   entry.socialLinks = request.body.socialLinks;
-  entry.sharedTo = request.body.sharedTo;
+
+  // Only the owner is allowed to change the shared user.
+  if (entry.owner === request.user!.sub) {
+    entry.sharedTo = request.body.sharedTo;
+  }
+
   entry.save();
   response.send({});
 });
