@@ -109,7 +109,8 @@ router.patch('/:name', needAuth,
     });
     return;
   }
-  if (entry.owner !== request.user!.sub) {
+  if (entry.owner !== request.user!.sub &&
+      !entry.sharedTo.includes(request.user!.sub)) {
     response.status(401);
     response.send({
         error: "Entry is owned by different user",
@@ -122,6 +123,9 @@ router.patch('/:name', needAuth,
   }
   if(request.body.friendlyName !== undefined) {
     entry.friendlyName = request.body.friendlyName;
+  }
+  if(request.body.sharedTo !== undefined && entry.owner === request.user!.sub) {
+    entry.sharedTo = request.body.sharedTo;
   }
   entry.save();
   response.send({});
