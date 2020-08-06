@@ -3,6 +3,8 @@ import { mongoose } from './mongooseConnection';
 import mongooseNamespace from 'mongoose';
 
 export interface ISocialLinks extends mongooseNamespace.Document {
+  telegram: string | null;
+  whatsapp: string | null;
   instagram: string | null;
   twitter: string | null;
   facebook: string | null;
