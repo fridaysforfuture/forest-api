@@ -19,5 +19,5 @@ jobs:
           cd /root/forest/forest-api
           git checkout master
           git pull
-          npm i --no-progress
-          pm2 restart forest-api
+          /root/.nvm/versions/node/v14.7.0/bin/npm i --no-progress
+          /root/.nvm/versions/node/v14.7.0/bin/pm2 restart forest-api
