@@ -5,3 +5,4 @@ tests/key.pub
 tests/key.priv
 coverage
 key.rs
+.env
