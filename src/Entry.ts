@@ -13,6 +13,7 @@ export interface IEntry extends mongooseNamespace.Document {
   friendlyName: string;
   links: Array<any>;
   owner: string;
+  sharedTo: Array<string>;
   socialLinks: ISocialLinks;
 }
 
@@ -21,6 +22,7 @@ const EntrySchema = new mongooseNamespace.Schema({
   friendlyName: String,
   links: Array,
   owner: String,
+  sharedTo: Array,
   socialLinks: {
     type: Object,
     required: true,
