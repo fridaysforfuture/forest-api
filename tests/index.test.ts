@@ -53,7 +53,7 @@ beforeAll(async () => {
   const keys = await getKeys();
   require('../src/index');
   const token = await jwt.sign({
-      username: 'test_user'
+      sub: 'test_user'
     },
     keys.privateKey,
     { algorithm: 'RS256' });
@@ -61,7 +61,7 @@ beforeAll(async () => {
     keys.privateKey,
     { algorithm: 'RS256' });
   const tokenDifferentUser = await jwt.sign({
-      username: 'other_user'
+      sub: 'other_user'
     },
     keys.privateKey,
     { algorithm: 'RS256' });
