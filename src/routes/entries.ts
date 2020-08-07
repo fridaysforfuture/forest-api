@@ -23,7 +23,7 @@ router.use(BodyParser.json());
 
 router.delete('/:name', needAuth, async (request, response) => {
   let entry = await Entry.findOne({
-    name: request.params.name
+    name: request.params.name.toLowerCase()
   });
   if (entry === null) {
     response.status(404);
