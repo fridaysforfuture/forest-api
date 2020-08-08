@@ -84,6 +84,13 @@ beforeAll(async () => {
         .put('/entries/berlin')
         .set(authHeader)
         .set('Accept', 'application/json');
+  /**
+    * Bern ebenfalls
+    */
+  await request('http://localhost:3001')
+        .put('/entries/bern')
+        .set(authHeader)
+        .set('Accept', 'application/json');
 })
 describe("Move fast", () => {
     it('and expect nothing.', function (done) {
@@ -122,6 +129,13 @@ describe("Send correct request", () => {
             .set(authHeader)
             .expect(200, done);
     }); 
+    it('and delete City', function (done) {
+        request('http://localhost:3001')
+            .delete('/entries/bern')
+            .set('Accept', 'application/json')
+            .set(authHeader)
+            .expect(200, done);
+    });
     it('and patch with no parameters', function (done) {
         request('http://localhost:3001')
             .patch('/entries/Berlin')
@@ -200,7 +214,21 @@ describe("Send incorrect request", () => {
             .set('Accept', 'application/json')
             .set(authHeaderDifferentUser)
             .expect(401, done);
-    })
+    });
+    it('and fail to delete non-existing City', function (done) {
+        request('http://localhost:3001')
+          .delete('/entries/Bielefeld')
+          .set('Accept', 'application/json')
+          .set(authHeader)
+          .expect(404, done);
+    });
+    it('and fail to delete existing City from different user', function (done) {
+        request('http://localhost:3001')
+            .delete('/entries/Berlin')
+            .set('Accept', 'application/json')
+            .set(authHeaderDifferentUser)
+            .expect(401, done);
+    });
 });
 
 describe("Do body param testing:", () => {

@@ -21,6 +21,25 @@ function testParams(body: any) {
 
 router.use(BodyParser.json());
 
+router.delete('/:name', needAuth, async (request, response) => {
+  let entry = await Entry.findOne({
+    name: request.params.name.toLowerCase()
+  });
+  if (entry === null) {
+    response.status(404);
+    response.send({ error: 'Entry does not exist' });
+    return;
+  }
+  if (entry.owner !== request.user!.sub) {
+    response.status(401);
+    response.send({ error: 'Can only delete owned entries' });
+    return;
+  }
+  await entry.remove();
+  response.status(200);
+  response.send({});
+});
+
 router.put('/:name', needAuth, async (request, response) => {
   if (request.body.links == undefined) {
     request.body.links = [];
