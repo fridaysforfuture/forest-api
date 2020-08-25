@@ -3,6 +3,7 @@ import BodyParser from 'body-parser';
 import Entry from '../Entry';
 import { needAuth } from '../auth';
 import cors from 'cors';
+import multer from 'multer';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ function testParams(body: any) {
 }
 
 router.use(BodyParser.json());
+const upload = multer({dest: "custom_pictures"})
 
 router.delete('/:name', needAuth, async (request, response) => {
   let entry = await Entry.findOne({
@@ -40,7 +42,30 @@ router.delete('/:name', needAuth, async (request, response) => {
   response.send({});
 });
 
-router.put('/:name', needAuth, async (request, response) => {
+let fileHandler: any = 
+  (request: any, _: any, next: any) => {
+  if (request.headers["content-type"]?.startsWith("multipart/form-data")) {
+    for (const key of Object.keys(request.body)) {
+      request.body[key] = JSON.parse(request.body[key]);
+    }
+  }
+  next();
+};
+
+router.put(
+  '/:name',
+  needAuth,
+  upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "background", maxCount: 1 }]),
+  fileHandler,
+  async (request, response) => {
+  let logo = (request.files as any)?.['logo']?.[0].filename;
+  let background = (request.files as any)?.['background']?.[0].filename;
+  console.log(request.files);
+  console.log(logo);
+  console.log(background);
+
   if (request.body.links == undefined) {
     request.body.links = [];
   }
@@ -49,6 +74,7 @@ router.put('/:name', needAuth, async (request, response) => {
   }
   if (request.body.friendlyName == undefined) {
     request.body.friendlyName = request.params.name;
+    console.log("This is a test");
   }
   if (request.body.sharedTo == undefined) {
     request.body.sharedTo = [];
@@ -79,6 +105,8 @@ router.put('/:name', needAuth, async (request, response) => {
       friendlyName: request.body.friendlyName,
       owner: request.user!.sub,
       sharedTo: request.body.sharedTo,
+      logo: logo,
+      background: background,
     }).save();
     response.send({});
     return;
@@ -94,12 +122,18 @@ router.put('/:name', needAuth, async (request, response) => {
   entry.links = request.body.links;
   entry.friendlyName = request.body.friendlyName;
   entry.socialLinks = request.body.socialLinks;
+  if (logo) {
+    entry.logo = logo;
+  }
+  if (background) {
+    entry.background = background;
+  }
 
   // Only the owner is allowed to change the shared user.
   if (entry.owner === request.user!.sub) {
     entry.sharedTo = request.body.sharedTo;
   }
-
+  console.log(entry);
   entry.save();
   response.send({});
 });

@@ -1,4 +1,5 @@
 .build
+custom_pictures/
 node_modules/
 bin/
 tests/key.pub

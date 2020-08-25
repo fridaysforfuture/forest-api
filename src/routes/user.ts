@@ -21,8 +21,6 @@ router.get('/:name', needAuth, async (request, response) => {
     { sharedTo: request.params.name },
     { _id: false, __v: false },
   );
-  console.log(sharedEntries);
-  console.log(ownEntries);
   response.send({
     ownEntries,
     sharedEntries,
