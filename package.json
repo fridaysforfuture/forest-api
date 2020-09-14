@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tsc && node --experimental-specifier-resolution=node --harmony-top-level-await bin/index.js",
     "test": "jest --detectOpenHandles --forceExit --coverage",
-    "jasmine": "ts-node node_modules/jasmine/bin/jasmine"
+    "jasmine": "ts-node node_modules/jasmine/bin/jasmine --silent"
   },
   "jest": {
     "verbose": true,
