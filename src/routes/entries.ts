@@ -21,6 +21,11 @@ function testParams(body: any) {
 
 router.use(BodyParser.json());
 
+router.get('/count', async (_request, response) => {
+  const count = await Entry.count({});
+  response.send({count});
+});
+
 router.delete('/:name', needAuth, async (request, response) => {
   let entry = await Entry.findOne({
     name: request.params.name.toLowerCase()
