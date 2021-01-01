@@ -8,9 +8,21 @@ const router = express.Router();
 
 router.use(cors());
 function testParams(body: any) {
-   if(body.links !== undefined && !Array.isArray(body.links)) {
+  if(body.links !== undefined && !Array.isArray(body.links)) {
     throw 'links is not an array';
   }
+
+  const linkFields = ['text', 'url'];
+  for (const link of body.links) {
+    for (const field of Object.keys(link)) {
+      console.log("Field", field);
+      if (!linkFields.includes(field)) {
+        console.log("Deleting addition field:", field);
+        delete link[field];
+      }
+    }
+  }
+  console.log(linkFields);
   if(body.socialLinks !== undefined && typeof(body.socialLinks) !== 'object') {
     throw 'socialLinks is not an object';
   }
