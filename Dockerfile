@@ -4,4 +4,4 @@ COPY . .
 RUN npm i
 EXPOSE 3001
 
-ENTRYPOINT [ "./docker-entrypoint.sh" ]
+ENTRYPOINT [ "npm", "start" ]
