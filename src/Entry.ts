@@ -9,6 +9,9 @@ export interface ISocialLinks extends mongooseNamespace.Document {
   twitter: string | null;
   facebook: string | null;
   website: string | null;
+  matrix: string | null;
+  signal: string | null;
+  tiktok: string | null;
 }
 export interface IEntry extends mongooseNamespace.Document {
   name: string;
